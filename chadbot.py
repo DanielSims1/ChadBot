@@ -56,3 +56,34 @@ ChadBot is an exploration of the Discord Bot API which utilizes information take
     
 """
 
+import os
+
+import discord
+from dotenv import load_dotenv
+
+from discord.ext import commands
+
+bot = commands.Bot(command_prefix='!')
+
+load_dotenv()
+TOKEN = os.getenv('DISCORD_TOKEN')
+TEST_GUILD = os.getenv('DISCORD_TEST_GUILD')
+GUILD = os.getenv('DISCORD_GUILD')
+
+@bot.event
+async def on_ready():
+    print(f'{bot.user.name} has connected to Discord!')
+
+bot.run(TOKEN)
+
+@bot.command(name='cheeki', help = "Help yourself cyka")
+async def cheeki(ctx):
+    await ctx.send("breeki")
+
+@bot.command(name='ammo', help = "Gives the best 3 ammo types for a given caliber, or a table of the best ammo for each caliber")
+async def ammo(ctx):
+    await ctx.send("Nofoodaftermidnight ammo spreadsheet --> https://docs.google.com/spreadsheets/d/1jjWcIue0_PCsbLQAiL5VrIulPK8SzM5jjiCMx9zUuvE/edit#gid=64053005")
+
+@bot.command(name='bestkeys', help = "Gives the best keys for a given map, or a table of all the best keys if no map is given")
+
+bot.run(TOKEN)
