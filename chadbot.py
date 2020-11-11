@@ -72,7 +72,41 @@ GUILD = os.getenv('DISCORD_GUILD')
 
 
 #This could be a mapping of gun names to screenshots of meta builds. screenshots could potentially be stored on this device and sent with the message.
-known_gun_names = {'hk416a5':"hk416a5.png", 'hk':"hk416a5.png", 'hk416': "hk416a1.png"} #, 'm4a1', 'SA-58', 'ak-74m', 'ash-12', 'as val', 'kel-tec rfb', '.308 mdr', '5.56 mdr', 'sr-25', 'akm', 'rpk-16'}
+known_gun_names = {'hk416a5':"hk416a5.png", 'hk':"hk416a5.png", 'hk416': "hk416a1.png",
+    'm4a1':"soonTM.png", 'm4':"soonTM.png",
+    'adar': "soonTM.png", 'adar 215': "soonTM.png", 'adar 2-15': "soonTM.png",
+    'sa-58':"soonTM.png", 'sa58':"soonTM.png",
+    'ak-74m':"soonTM.png", 'ak-74':"soonTM.png", 'ak74m': "soonTM.png", 'ak74': "soonTM.png", 'ak': "soonTM.png",
+    'ash-12':"soonTM.png", 'ash':"soonTM.png",
+    'asval':"soonTM.png", 'as val':"soonTM.png", 'as-val': "soonTM.png",'val': "soonTM.png",
+    'kel-tec rfb':"soonTM.png", 'rfb':"soonTM.png",
+    '.308 mdr':"soonTM.png", 'mdr .308':"soonTM.png", 'mdr 308': "soonTM.png", '308 mdr' : "soonTM.png",
+    '5.56 mdr':"soonTM.png", '556 mdr':"soonTM.png", 'mdr 5.56': "soonTM.png", 'mdr 556': "soonTM.png",
+    'sr-25':"soonTM.png", 'sr25':"soonTM.png",
+    'akm':"soonTM.png",
+    'rpk':"soonTM.png", 'rpk-16':"soonTM.png", 'rpk16': "soonTM.png",
+    'tx-15 dml': "soonTM.png", 'tx-15': "soonTM.png", 'tx15 dml' : "soonTM.png", 'tx15': "soonTM.png",
+    'sks': "soonTM.png", 'op-sks' : "soonTM.png",
+    'mp5':"soonTM.png", 'mp5k':"soonTM.png", 'mp5k-n': "soonTM.png", 'mp5kn': "soonTM.png",
+    'mp7':"hk416a5.png", 'mp7a2':"hk416a5.png",
+    'mp9': "soonTM.png",
+    'mpx': "soonTM.png",
+    'p90': "soonTM.png",
+    'm1a': "soonTM.png",
+    'rsass': "soonTM.png",
+    'vss': "soonTM.png",
+    'svd': "soonTM.png",'svds': "soonTM.png",
+
+
+
+
+
+
+
+
+
+} 
+# 'm4a1':"soonTM", 'SA-58', 'ak-74m', 'ash-12', 'as val', 'kel-tec rfb', '.308 mdr', '5.56 mdr', 'sr-25', 'akm', 'rpk-16'}
 # force queries to lowercase to ensure they get correct build
 
 @bot.event
@@ -83,7 +117,7 @@ async def on_ready():
 async def cheeki(ctx):
     await ctx.send("breeki")
 
-@bot.command(name='best', help = "Gives you the best meta build for a given gun, preferring recoil")
+@bot.command(name='best', help = "Gives you the best overall meta build for a given gun")
 async def best_gun(ctx, gun_name):
     # force to lowercase to make queries easier
     formatted_gun_name = gun_name.lower()
