@@ -71,43 +71,32 @@ TEST_GUILD = os.getenv('DISCORD_TEST_GUILD')
 GUILD = os.getenv('DISCORD_GUILD')
 
 
-#This could be a mapping of gun names to screenshots of meta builds. screenshots could potentially be stored on this device and sent with the message.
-known_gun_names = {'hk416a5':"hk416a5.png", 'hk':"hk416a5.png", 'hk416': "hk416a1.png",
-    'm4a1':"soonTM.png", 'm4':"soonTM.png",
-    'adar': "soonTM.png", 'adar 215': "soonTM.png", 'adar 2-15': "soonTM.png",
-    'sa-58':"soonTM.png", 'sa58':"soonTM.png",
-    'ak-74m':"soonTM.png", 'ak-74':"soonTM.png", 'ak74m': "soonTM.png", 'ak74': "soonTM.png", 'ak': "soonTM.png",
-    'ash-12':"soonTM.png", 'ash':"soonTM.png",
-    'asval':"soonTM.png", 'as val':"soonTM.png", 'as-val': "soonTM.png",'val': "soonTM.png",
-    'kel-tec rfb':"soonTM.png", 'rfb':"soonTM.png",
-    '.308 mdr':"soonTM.png", 'mdr .308':"soonTM.png", 'mdr 308': "soonTM.png", '308 mdr' : "soonTM.png",
-    '5.56 mdr':"soonTM.png", '556 mdr':"soonTM.png", 'mdr 5.56': "soonTM.png", 'mdr 556': "soonTM.png",
-    'sr-25':"soonTM.png", 'sr25':"soonTM.png",
-    'akm':"soonTM.png",
-    'rpk':"soonTM.png", 'rpk-16':"soonTM.png", 'rpk16': "soonTM.png",
-    'tx-15 dml': "soonTM.png", 'tx-15': "soonTM.png", 'tx15 dml' : "soonTM.png", 'tx15': "soonTM.png",
-    'sks': "soonTM.png", 'op-sks' : "soonTM.png",
-    'mp5':"soonTM.png", 'mp5k':"soonTM.png", 'mp5k-n': "soonTM.png", 'mp5kn': "soonTM.png",
-    'mp7':"hk416a5.png", 'mp7a2':"hk416a5.png",
-    'mp9': "soonTM.png",
-    'mpx': "soonTM.png",
-    'p90': "soonTM.png",
-    'm1a': "soonTM.png",
-    'rsass': "soonTM.png",
-    'vss': "soonTM.png",
-    'svd': "soonTM.png",'svds': "soonTM.png",
-
-
-
-
-
-
-
-
-
+# This could be a mapping of gun names to screenshots of meta builds. screenshots could potentially be stored on this device and sent with the message.
+known_gun_names = {
+    'hk416a5':"hk416a5.png", 'hk':"hk416a5.png", 'hk416': "hk416a1.png",
+    'm4a1':"m4a1.png", 'm4':"m4a1.png",
+    'adar': "adar.png", 'adar 215': "adar.png", 'adar 2-15': "adar.png",
+    'sa-58':"sa-58.png", 'sa58':"sa-58.png",
+    'ak-74m':"ak-74m.png", 'ak-74':"ak-74m.png", 'ak74m': "ak-74m.png", 'ak74': "ak-74m.png", 'ak': "ak-74m.png",
+    'asval':"as-val.png", 'as val':"as-val.png", 'as-val': "as-val.png",'val': "as-val.png",
+    'kel-tec rfb':"rfb.png", 'rfb':"rfb.png",
+    '.308 mdr':"308-mdr.png", 'mdr .308':"308-mdr.png", 'mdr 308': "308-mdr.png", '308 mdr' : "308-mdr.png",
+    '5.56 mdr':"mdr-556.png", '556 mdr':"mdr-556.png", 'mdr 5.56': "mdr-556.png", 'mdr 556': "mdr-556.png",
+    'sr-25':"sr-25.png", 'sr25':"sr-25.png",
+    'akm':"akm.png",
+    'rpk':"rpk.png", 'rpk-16':"rpk.png", 'rpk16': "rpk.png",
+    'tx-15 dml': "tx-15.png", 'tx-15': "tx-15.png", 'tx15 dml' : "tx-15.png", 'tx15': "tx-15.png",
+    'sks': "op-sks.png", 
+    'op-sks' : "op-sks.png",
+    'mp5':"mp5.png", 
+    'mp7':"mp7.png", 'mp7a2':"mp7.png",
+    'mpx': "mpx.png",
+    'p90': "p90.png",
+    'm1a': "m1a.png",
+    'rsass': "rsass.png",
+    'vss': "vss.png",
+    'svd': "svds.png",'svds': "svds.png"
 } 
-# 'm4a1':"soonTM", 'SA-58', 'ak-74m', 'ash-12', 'as val', 'kel-tec rfb', '.308 mdr', '5.56 mdr', 'sr-25', 'akm', 'rpk-16'}
-# force queries to lowercase to ensure they get correct build
 
 @bot.event
 async def on_ready():
