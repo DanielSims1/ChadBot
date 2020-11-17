@@ -8,9 +8,6 @@ ChadBot is an exploration of the Discord Bot API which utilizes information take
         !keys <map> -b[est] -u[seless]
         !bestkeys -m[ap] <map_name>
         !key <key_name> 
-        !uselesskeys
-
-        !useful <name>
 
         !best <gun> -r[ecoil] -e[rgonomics]
             !recoil <gun>
@@ -63,7 +60,9 @@ from dotenv import load_dotenv
 
 from discord.ext import commands
 
-bot = commands.Bot(command_prefix='!')
+command_prefix = '!'
+
+bot = commands.Bot(command_prefix= command_prefix)
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -72,7 +71,7 @@ GUILD = os.getenv('DISCORD_GUILD')
 
 
 # This could be a mapping of gun names to screenshots of meta builds. screenshots could potentially be stored on this device and sent with the message.
-known_gun_names = {
+known_guns = {
     'hk416a5':"hk416a5.png", 'hk':"hk416a5.png", 'hk416': "hk416a1.png",
     'm4a1':"m4a1.png", 'm4':"m4a1.png",
     'adar': "adar.png", 'adar 215': "adar.png", 'adar 2-15': "adar.png",
@@ -97,6 +96,10 @@ known_gun_names = {
     'vss': "vss.png",
     'svd': "svds.png",'svds': "svds.png"
 } 
+known_gun_names = known_guns.keys()
+
+recoil_param = ["recoil","rec","r"]
+ergonomics_param = ["ergonomics","ergo", "e"]
 
 @bot.event
 async def on_ready():
@@ -107,19 +110,44 @@ async def cheeki(ctx):
     await ctx.send("breeki")
 
 @bot.command(name='best', help = "Gives you the best overall meta build for a given gun")
-async def best_gun(ctx, gun_name):
-    # force to lowercase to make queries easier
-    formatted_gun_name = gun_name.lower()
-    # assuming no *recoil* or *ergonomics* modifier
-    if formatted_gun_name in known_gun_names.keys():
-        # get file from correct location
-        gun_image = discord.File(f"images/best/{known_gun_names.get(formatted_gun_name)}")
-        await ctx.send("Here is the best build for the {}, enjoy comrade!".format(formatted_gun_name))
-        await ctx.send(file=gun_image)
+async def best_gun(ctx, *args):
+    gun_name = ""
+    optimizer = ""
+    well_formatted = False
 
+    if len(args) > 2:
+        await ctx.send(f"The *{command_prefix}best* command only permits up to 2 arguments: gun_name [required], and recoil/ergonomics (optional) \nEx: !best m4a1 recoil")
     else:
-        await ctx.send(f"The gun *{gun_name}* currently lacks meta builds.... make sure you typed the name correctly")
+    # extract meaning from commands  
+        for arg in args:
+            clean_arg = arg.lower()
+            if clean_arg in known_gun_names:
+                if gun_name == "":
+                    gun_name = clean_arg
+                    well_formatted = True
+                else:
+                    await ctx.send("What are you trying to do here? Ask for one gun at a time!")
+                    well_formatted = False
+            if clean_arg in recoil_param or clean_arg in ergonomics_param:
+                if optimizer == "":
+                    optimizer = clean_arg
+                else:
+                    await ctx.send("One gun.... one optimizer... is that so hard??")
 
+        if well_formatted:
+            if optimizer in ergonomics_param:
+                optimizer = "ergonomics"
+                gun_image = discord.File(f"images/ergonomics/{known_guns.get(gun_name)}")
+            elif optimizer in recoil_param:
+                optimizer = "recoil"
+                gun_image = discord.File(f"images/recoil/{known_guns.get(gun_name)}")
+            else:
+                gun_image = discord.File(f"images/best/{known_guns.get(gun_name)}")
+            await ctx.send(f"Here is the best {optimizer} build for the {gun_name}, enjoy comrade!")
+            await ctx.send(file=gun_image)
+@best_gun.error
+async def best_gun_error(ctx, error):
+    await ctx.send('Uhhh comrade have you been breaking into my vodka stash again??\n :rat:\n\n\t\t     :white_small_square:\n\t\t\t\t:white_small_square:\n\t\t\t\t    :champagne: ')
 
 @bot.command(name='ammo', help = "Gives the best 3 ammo types for a given caliber, or a table of the best ammo for each caliber")
 async def ammo(ctx):
