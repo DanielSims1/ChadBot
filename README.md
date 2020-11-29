@@ -2,7 +2,7 @@
 > A Discord Bot used to help an EFT player, whether they be rat or chad.
  
 ## List of Commands:
--       !keys <map> -b[est] -u[seless]
+-     !keys <map> -b[est] -u[seless]
 -        !bestkeys -m[ap] <map_name>
 -        !key <key_name> 
 -        !best <gun> -r[ecoil] -e[rgonomics]
