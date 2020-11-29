@@ -118,20 +118,14 @@ async def hello_my_friend(ctx):
     voice_channel = ctx.author.voice.channel
     if voice_channel != None:
         vc = await voice_channel.connect()
-        vc.play(discord.FFmpegPCMAudio("audio/hello_my_friends.wav"), after = disconnect_after_sound)
-        
+        vc.play(discord.FFmpegPCMAudio("audio/hello_my_friends.wav"), after = disconnect_after_sound(vc))
     else:
         await ctx.send(str(ctx.message.author),"is not in a voice channel")
 
-def disconnect_after_sound(error):
-    # get current voice channel
-    for  guild in bot.guilds:
-        if guild.voice_client != None:
-            fut = asyncio.run_coroutine_threadsafe(guild.voice_client.disconnect(), guild.voice_client.loop)
-            try: fut.result()
-            except:
-                e = sys.exc_info()[0]
-                print( "Error: %s" % e )
+def disconnect_after_sound(vc):
+    def f(error):
+        asyncio.run_coroutine_threadsafe(vc.disconnect(), vc.loop)
+    return f
     
     
 @bot.command(name='best', help = "Gives you the best overall meta build for a given gun")
