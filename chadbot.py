@@ -57,6 +57,11 @@ import os
 
 import discord
 import asyncio
+
+# for wiki querying
+import requests
+from bs4 import BeautifulSoup
+
 from dotenv import load_dotenv
 
 from discord.ext import commands
@@ -104,7 +109,6 @@ ergonomics_param = ["ergonomics","ergo", "e"]
 
 @bot.event
 async def on_ready():
-
     print(f'{bot.user.name} has connected to Discord!')
 
 @bot.command(name= 'cheeki', help = "Help yourself cyka")
@@ -175,5 +179,36 @@ async def ammo(ctx):
 @bot.command(name='bestkeys', help = "Gives the best keys for a given map, or a table of all the best keys if no map is given")
 async def bestkeys(ctx):
     await ctx.send("out of date best keys --> https://preview.redd.it/let6rgrtq8951.png?width=960&crop=smart&auto=webp&s=bb6ecc50549e3dc4c7e9d6e75529820613d003b1")
+
+@bot.command(name='wiki', help = "Queries the Tarkov Wiki")
+async def wiki(ctx, *,search_arg):
+    search_string = str(search_arg)
+    tarkov_wiki_base_url = "https://escapefromtarkov.gamepedia.com/Special:Search?search="
+    tarkov_wiki = requests.get(f"{tarkov_wiki_base_url}{search_string}", auth=('user','pass'))
+
+    soup = BeautifulSoup(tarkov_wiki.text, 'html.parser')
+
+    is_correct_page = soup.find("meta", property = "og:description")
+    # If we searched the exact name of a page, then we are brought directly to it
+    if is_correct_page:
+        embed = discord.Embed(title=search_string,description=f"[{search_string} Wiki Page]({tarkov_wiki_base_url}{search_string})")
+        await ctx.send(content=f"Here is the wiki page for `{search_string}` comrade:",embed=embed)
+    
+    #Otherwize show top x search results
+    else:
+        top_urls = list()
+        for top_result in soup.find_all("a", class_ = "unified-search__result__link"):
+            top_urls.append((top_result.get('data-title'),top_result.get('href')))
+        
+        num_results = 5
+        if num_results <= len(top_urls):
+            embed = discord.Embed(title=search_string,description=f"Top {num_results} search results for `{search_string}`: ")
+            embedString = ""
+            for i in range(num_results):
+                embedString += f"[{top_urls[i][0]}]({top_urls[i][1]})\n"
+            embed.add_field(name=chr(173), value=embedString,inline=False)
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send(f"Sorry comrade, no results found for {search_string}")
 
 bot.run(TOKEN)
