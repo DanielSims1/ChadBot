@@ -64,7 +64,13 @@ from bs4 import BeautifulSoup
 
 from dotenv import load_dotenv
 
+import re
+
 from discord.ext import commands
+
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 command_prefix = '!'
 
@@ -114,6 +120,56 @@ async def on_ready():
 @bot.command(name= 'cheeki', help = "Help yourself cyka")
 async def cheeki(ctx):
     await ctx.send("breeki")
+
+#@bot.command(name = 'key', help = "Gives you the map and rating out of 5 stars for a key")
+async def key(ctx):
+    # So we want to do another search on the wiki for a key then rate the key  0/5 [ ] --> 5/5 [⭐⭐⭐⭐⭐]
+    # also notify user if this is a quest key
+    weights = ["ledx", "graphics card", "safe"]
+    scoring_items = [50, 30, 20]
+    quest = "❗"
+
+@bot.command(name= "price", help = "Queries for lowest current price of item on the flea market")
+async def price(ctx, *,search_arg):
+    # Use wiki to get well-formatted text then convert to the tarkov-market.com format [" " -> "_"]
+    search_string = str(search_arg)
+    tarkov_wiki_base_url = "https://escapefromtarkov.gamepedia.com/Special:Search?search="
+    tarkov_wiki = requests.get(f"{tarkov_wiki_base_url}{search_string}", auth=('user','pass'))
+
+    tarkov_market_url = "https://tarkov-market.com/item/"
+
+    soup = BeautifulSoup(tarkov_wiki.text, 'html.parser')
+
+    is_correct_page = soup.find("meta", property = "og:description")
+    # If we searched the exact name of a page, then we are brought directly to it
+    if is_correct_page:
+        title_string = soup.find("meta", property = "og:title")
+
+        if(title_string):
+            title_text = title_string["content"]
+            url_title = title_text.replace(" ", "_")            
+            
+            is_yelling = re.findall("[A-Z]{2}", url_title)
+
+            if is_yelling:
+                url_title = url_title.lower();
+
+            #print(f"⭐⭐hitting : {tarkov_market_url}{url_title} ")
+            tarkov_market = requests.get(f"{tarkov_market_url}{url_title}", auth=('user','pass'))
+
+            market_soup = BeautifulSoup(tarkov_market.text, 'html.parser')
+
+            if(tarkov_market):
+                price = market_soup.find("div", class_="price last").string
+
+                await ctx.send(f"Price for {title_text}: [{price}]")
+
+    # Otherwise show top x search results TODO MAKE WORK
+    else:
+        top_urls = list()
+        for top_result in soup.find_all("a", class_ = "unified-search__result__link"):
+            top_urls.append((top_result.get('data-title'),top_result.get('href')))
+
 
 # Join the voice channel of user and greet them with a hello my friend
 @bot.command(name = "hello", help = "Hello my friend!")
@@ -170,6 +226,8 @@ async def best_gun(ctx, *args):
             await ctx.send(file=gun_image)
 @best_gun.error
 async def best_gun_error(ctx, error):
+    logger = logging.getLogger('tcpserver')
+    logger.warn(error)
     await ctx.send('Uhhh comrade have you been breaking into my vodka stash again??\n :rat:\n\n\t\t     :white_small_square:\n\t\t\t\t:white_small_square:\n\t\t\t\t    :champagne: ')
 
 @bot.command(name='ammo', help = "Gives the best 3 ammo types for a given caliber, or a table of the best ammo for each caliber")
@@ -194,7 +252,7 @@ async def wiki(ctx, *,search_arg):
         embed = discord.Embed(title=search_string,description=f"[{search_string} Wiki Page]({tarkov_wiki_base_url}{search_string})")
         await ctx.send(content=f"Here is the wiki page for `{search_string}` comrade:",embed=embed)
     
-    #Otherwize show top x search results
+    # Otherwise show top x search results
     else:
         top_urls = list()
         for top_result in soup.find_all("a", class_ = "unified-search__result__link"):
