@@ -143,32 +143,29 @@ async def price(ctx, *,search_arg):
     is_correct_page = soup.find("meta", property = "og:description")
     # If we searched the exact name of a page, then we are brought directly to it
     if is_correct_page:
-        title_string = soup.find("meta", property = "og:title")
+        title_string = soup.find("meta", property = "og:title")["content"]
 
-        if(title_string):
-            title_text = title_string["content"]
-            url_title = title_text.replace(" ", "_")            
-            
-            is_yelling = re.findall("[A-Z]{2}", url_title)
+    else: # return top result
+        title_string = soup.find("a", class_ = "unified-search__result__link")["data-title"]
+        
+    if(title_string):
+        url_title = title_string.replace(" ", "_")
+    
+        is_yelling = re.findall("[A-Z]{2}", url_title)
+        if is_yelling:
+            url_title = url_title.lower();
 
-            if is_yelling:
-                url_title = url_title.lower();
+        tarkov_market = requests.get(f"{tarkov_market_url}{url_title}", auth=('user','pass'))
+        market_soup = BeautifulSoup(tarkov_market.text, 'html.parser')
 
-            #print(f"⭐⭐hitting : {tarkov_market_url}{url_title} ")
-            tarkov_market = requests.get(f"{tarkov_market_url}{url_title}", auth=('user','pass'))
+        if(tarkov_market):
+            price = market_soup.find("div", class_="price last").string
 
-            market_soup = BeautifulSoup(tarkov_market.text, 'html.parser')
+            embed = discord.Embed(title=price,description=f"{title_string}")
+            await ctx.send(content=f"Price check for {title_string}",embed=embed)
 
-            if(tarkov_market):
-                price = market_soup.find("div", class_="price last").string
-
-                await ctx.send(f"Price for {title_text}: [{price}]")
-
-    # Otherwise show top x search results TODO MAKE WORK
     else:
-        top_urls = list()
-        for top_result in soup.find_all("a", class_ = "unified-search__result__link"):
-            top_urls.append((top_result.get('data-title'),top_result.get('href')))
+        await ctx.send(f"Sorry comrade, no prices found for {search_string}")
 
 
 # Join the voice channel of user and greet them with a hello my friend
