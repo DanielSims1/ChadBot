@@ -1,13 +1,19 @@
 # ChadBot
 > A Discord Bot used to help an EFT player, whether they be rat or chad.
+
+### ✔️ Completed feature 
+### ❓  -> Feature that needs to be updated
  
 ## List of Commands:
-- [ ]    !keys <map> -b[est] -u[seless]
+-  [ ]    !keys <map> -b[est] -u[seless]
 -  [ ]      !bestkeys -m[ap] <map_name>
 -  [ ]      !key <key_name> 
--   [ ]     !best <gun> -r[ecoil] -e[rgonomics]
-      -  [ ]    !recoil <gun>
-      -  [ ]    !ergo <gun>
+❓     !best <gun> -r[ecoil] -e[rgonomics]
+ 
+    ❓    !recoil <gun>
+ 
+    ❓    !ergo <gun>
+ 
 -  [ ]      !med <name>
 -   [ ]     !stim <name>
 -   [ ]    !map <name>
@@ -19,17 +25,24 @@
 -   [ ]     !quests <quest_name)
 -   [ ]     !kappa
 -   [ ]     !keeplist -h[ideout] -q[uests]
--   [ ]     !ammochart
+                                 
+✔️     !ammochart
+
 -    [ ]    !ammo -g[un] <gun_name> -c[aliber] <round_caliber>
 -   [ ]     !armor <name>
 -    [ ]    !sellorder
 -   [ ]     !bitcoin !btc 
         
--   [ ]     !cheeky 
--   [ ]     !dicky
+✔️    !cheeky 
+
+✔️     !dicky
+
 -    [ ]    !chadloadout
 -   [ ]     !chadtip
 -   [ ]     !rattip
--   [ ]     !value <item>
--   [ ]     !wiki <query>
+
+✔️     !price <item>
+ 
+✔️     !wiki <query>
+ 
  - [ ] !mumble
