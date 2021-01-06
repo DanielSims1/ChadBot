@@ -64,13 +64,28 @@ ergonomics_param = ["ergonomics","ergo", "e"]
 async def on_ready():
     print(f'{bot.user.name} has connected to Discord!')
 
-@bot.command(name= 'cheeki', help = "Help yourself cyka")
+
+# [Simple reflex commands]
+@bot.command(name= 'cheeki')
 async def cheeki(ctx):
     await ctx.send("breeki")
 
-@bot.command(name= 'dicky', help = "Help yourself cyka")
+@bot.command(name= 'dicky')
 async def dicky(ctx):
     await ctx.send("needles")
+
+
+@bot.command(name = "ammo", help = "Shows an ammo chart for the requested gun or caliber")
+async def ammo(ctx, gun):
+    # Get the ammo page then search for rounds associated with a given gun
+    wiki_ammo_page = requests.get("https://escapefromtarkov.gamepedia.com/Ammunition", auth=('user','pass'))
+    ammo_soup = BeautifulSoup(wiki_ammo_page.text, 'html.parser')
+    ammo_rows = ammo_soup.find_all("tr")
+
+    print(ammo_rows.prettify())
+
+
+
 
 #@bot.command(name = 'key', help = "Gives you the map and rating out of 5 stars for a key")
 async def key(ctx):
@@ -79,7 +94,6 @@ async def key(ctx):
     weights = ["ledx", "graphics card", "safe"]
     scoring_items = [50, 30, 20]
     quest = "❗"
-
 
 
 @bot.command(name= "price", help = "Queries for lowest current price of item on the flea market")
@@ -142,8 +156,7 @@ def disconnect_after_sound(vc):
     def f(error):
         asyncio.run_coroutine_threadsafe(vc.disconnect(), vc.loop)
     return f
-    
-    
+
 #TODO Update this with latest gun builds
 @bot.command(name='best', help = "Gives you the best overall meta build for a given gun")
 async def best_gun(ctx, *args):
@@ -187,8 +200,8 @@ async def best_gun_error(ctx, error):
     logger.warn(error)
     await ctx.send('Uhhh comrade have you been breaking into my vodka stash again??\n :rat:\n\n\t\t     :white_small_square:\n\t\t\t\t:white_small_square:\n\t\t\t\t    :champagne: ')
 
-@bot.command(name='ammo', help = "Gives the best 3 ammo types for a given caliber, or a table of the best ammo for each caliber")
-async def ammo(ctx):
+@bot.command(name='ammochart', help = "Shows a table of the best ammo for each caliber")
+async def ammochart(ctx):
     await ctx.send("Nofoodaftermidnight ammo spreadsheet --> https://docs.google.com/spreadsheets/d/1jjWcIue0_PCsbLQAiL5VrIulPK8SzM5jjiCMx9zUuvE/edit#gid=64053005")
 
 @bot.command(name='bestkeys', help = "Gives the best keys for a given map, or a table of all the best keys if no map is given")
