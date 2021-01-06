@@ -1,58 +1,3 @@
-"""
-ChadBot is an exploration of the Discord Bot API which utilizes information taken from the Official Tarkov Wiki to fuffill user requests
-    Potential prefixs
-        ! , . , > , / , // , $ , % , ^ , & , * , - , + , = , _ , : , \  
-
-    List of Commands:
-
-        !keys <map> -b[est] -u[seless]
-        !bestkeys -m[ap] <map_name>
-        !key <key_name> 
-
-        !best <gun> -r[ecoil] -e[rgonomics]
-            !recoil <gun>
-            !ergo <gun>
-        !med <name>
-        !stim <name>
-
-        !map <name>
-        !maps
-
-        !trader -n[ame] <level> 
-        !prapor !therapist !pk !jaeger !mechanic !ragman <level> 
-
-        !hideout <station>
-        !hideoutitems
-
-        !quests <quest_name)
-        !kappa
-
-        !keeplist -h[ideout] -q[uests]
-
-        !ammochart
-        !ammo -g[un] <gun_name> -c[aliber] <round_caliber>
-
-        !armor <name>
-
-        !sellorder
-        !bitcoin !btc 
-        
-        !cheeky 
-        !dicky
-
-        !chadloadout
-
-        !chadtip
-
-        !rattip
-
-        !value <item>
-
-        !wiki <query>
-
-    
-"""
-
 import os
 
 import discord
@@ -62,7 +7,9 @@ import asyncio
 import requests
 from bs4 import BeautifulSoup
 
+# for creds
 from dotenv import load_dotenv
+
 
 import re
 
@@ -121,6 +68,10 @@ async def on_ready():
 async def cheeki(ctx):
     await ctx.send("breeki")
 
+@bot.command(name= 'dicky', help = "Help yourself cyka")
+async def dicky(ctx):
+    await ctx.send("needles")
+
 #@bot.command(name = 'key', help = "Gives you the map and rating out of 5 stars for a key")
 async def key(ctx):
     # So we want to do another search on the wiki for a key then rate the key  0/5 [ ] --> 5/5 [⭐⭐⭐⭐⭐]
@@ -128,6 +79,8 @@ async def key(ctx):
     weights = ["ledx", "graphics card", "safe"]
     scoring_items = [50, 30, 20]
     quest = "❗"
+
+
 
 @bot.command(name= "price", help = "Queries for lowest current price of item on the flea market")
 async def price(ctx, *,search_arg):
@@ -167,6 +120,12 @@ async def price(ctx, *,search_arg):
     else:
         await ctx.send(f"Sorry comrade, no prices found for {search_string}")
 
+@price.error
+async def best_gun_error(ctx, error):
+    logger = logging.getLogger('tcpserver')
+    logger.warn(error)
+    await ctx.send('Uhhh comrade have you been breaking into my vodka stash again??\n :rat:\n\n\t\t     :white_small_square:\n\t\t\t\t:white_small_square:\n\t\t\t\t    :champagne: ')
+
 
 # Join the voice channel of user and greet them with a hello my friend
 @bot.command(name = "hello", help = "Hello my friend!")
@@ -185,6 +144,7 @@ def disconnect_after_sound(vc):
     return f
     
     
+#TODO Update this with latest gun builds
 @bot.command(name='best', help = "Gives you the best overall meta build for a given gun")
 async def best_gun(ctx, *args):
     gun_name = ""
