@@ -2,20 +2,18 @@ import os
 
 import discord
 import asyncio
+from discord.ext import commands
+
+# for creds
+from dotenv import load_dotenv
 
 # for wiki querying
 import requests
 from bs4 import BeautifulSoup
 
-# for creds
-from dotenv import load_dotenv
-
-
 import re
-
-from discord.ext import commands
-
 import logging
+import texttable
 
 logging.basicConfig(level=logging.INFO)
 
@@ -80,11 +78,31 @@ async def ammo(ctx, gun):
     # Get the ammo page then search for rounds associated with a given gun
     wiki_ammo_page = requests.get("https://escapefromtarkov.gamepedia.com/Ammunition", auth=('user','pass'))
     ammo_soup = BeautifulSoup(wiki_ammo_page.text, 'html.parser')
-    ammo_rows = ammo_soup.find_all("tr")
 
-    print(ammo_rows.prettify())
+    gun_row =  ammo_soup.find(string=re.compile(gun)).parent.parent.parent
+    href = gun_row.find("a")["href"]
+    
+    gun_page = requests.get(f"https://escapefromtarkov.gamepedia.com{href}", auth=('user','pass'))
+    gun_soup = BeautifulSoup(gun_page.text, 'html.parser')
+
+    headers = []
+
+    table = Texttable()
+
+    for h in gun_soup.find_all("th"):
+        headers.append(h.text.replace("\n", ""))
+        if "Sold by" in h.text: #sloppy, I want to use "headerSort" class instead
+            break
 
 
+    text_row = []
+    table.add_row(headers)
+
+    table_body = gun_soup.find("tbody")
+    for row in table_body.find("tr"):
+        text_row.append(html_row_to_data_row(str(row))
+
+    def html_row_to_data_row(row):
 
 
 #@bot.command(name = 'key', help = "Gives you the map and rating out of 5 stars for a key")
