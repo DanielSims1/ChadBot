@@ -26,6 +26,9 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 TEST_GUILD = os.getenv('DISCORD_TEST_GUILD')
 GUILD = os.getenv('DISCORD_GUILD')
 
+LOGGING = True
+
+traders = ["Jaeger", "Prapor", "Therapist", "Skier", "Peacekeeper", "Mechanic", "Ragman", "Fence"]
 
 # This could be a mapping of gun names to screenshots of meta builds. screenshots could potentially be stored on this device and sent with the message.
 known_guns = {
@@ -63,7 +66,7 @@ async def on_ready():
     print(f'{bot.user.name} has connected to Discord!')
 
 
-# [Simple reflex commands]
+# [Simple refledx commands]
 @bot.command(name= 'cheeki')
 async def cheeki(ctx):
     await ctx.send("breeki")
@@ -71,6 +74,11 @@ async def cheeki(ctx):
 @bot.command(name= 'dicky')
 async def dicky(ctx):
     await ctx.send("needles")
+
+def tableify(headers, data):
+    ret_string = ""
+    ret_string = " | ".join(headers)
+
 
 
 @bot.command(name = "ammo", help = "Shows an ammo chart for the requested gun or caliber")
@@ -90,46 +98,46 @@ async def ammo(ctx, gun):
 
     data_rows = []
     rows = table_body.find_all('tr')
+
+    fir_rounds = ["7N39 \"Igolnik\"", "M406 (HE)", "M433 (HEDP)", "M441(HE)", "M576(MP-APERS)"]
+    fir_string = "Loot/Craft Only"
+    
     for row in rows:
         good_vals = []
         cols = row.find_all('td')
         if cols:
+            good_vals = [cols[0].string,cols[1].string] #extract damage and pen
             for col in cols:
                 if col.a:
-                    good_vals.append(col.a.string)
-            good_vals = [cols[0].string,cols[1].string] #extract damage and pen
-            if row.a:
-                good_vals.append(row.a['title']) #extract name
+                    if col.a.string in traders:
+                        good_vals.append(col.a.string) # trader name
             if(row.th.a):
-                title = " ".join(row.th.a['title'].split()[-2:]).replace("mm ","")
-                good_vals.insert(0,f"{title}")
+                title = " ".join(row.th.a['title'].split()[-2:]).replace("mm ","") # title of bullet without mm
+                good_vals.insert(0, title)
+                if title in fir_rounds:
+                    good_vals.append(fir_string)
+
             data_rows.append(good_vals)
-    data_rows = data_rows[1:]
 
     headers = ["Name","Damage","Pen","Sold by"]
-
-    print (f"{headers}\n{data_rows}")
-
+    
+    #if LOGGING:
     lengths = []
-
-
-    #rough sizing for table
-    for i in range(0,len(headers)):
-        head_len = len(headers[i])
-        item_len = len(data_rows[0][i])
-        lengths.append(max(head_len,item_len))
-
+    lengths = [len(head) for head in headers]
+    
+    # table sizing
+    for i in range(0, len(headers)):
+        for row in data_rows:
+            lengths[i] = max(len(row[i]),lengths[i])
     table.set_cols_width(lengths)
-    table.header(headers)
     table.add_row(headers)
     table.add_rows(data_rows)
+    msg = "```prolog\n"+table.draw() + " ```"
 
-
-
-    #print (table.draw())
-
-
-    
+    nice_ammo = href.replace("_", " ")
+    nice_ammo = nice_ammo[1:]
+    embed = discord.Embed(title=nice_ammo,description=msg)
+    await ctx.send(content=f"Ammo Chart for {nice_ammo}",embed=embed)
 
 
 #@bot.command(name = 'key', help = "Gives you the map and rating out of 5 stars for a key")
