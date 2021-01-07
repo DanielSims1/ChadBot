@@ -85,24 +85,51 @@ async def ammo(ctx, gun):
     gun_page = requests.get(f"https://escapefromtarkov.gamepedia.com{href}", auth=('user','pass'))
     gun_soup = BeautifulSoup(gun_page.text, 'html.parser')
 
-    headers = []
-
-    table = Texttable()
-
-    for h in gun_soup.find_all("th"):
-        headers.append(h.text.replace("\n", ""))
-        if "Sold by" in h.text: #sloppy, I want to use "headerSort" class instead
-            break
-
-
-    text_row = []
-    table.add_row(headers)
-
+    table = texttable.Texttable()
     table_body = gun_soup.find("tbody")
-    for row in table_body.find("tr"):
-        text_row.append(html_row_to_data_row(str(row))
 
-    def html_row_to_data_row(row):
+    data_rows = []
+    rows = table_body.find_all('tr')
+    for row in rows:
+        good_vals = []
+        cols = row.find_all('td')
+        if cols:
+            for col in cols:
+                if col.a:
+                    good_vals.append(col.a.string)
+            good_vals = [cols[0].string,cols[1].string] #extract damage and pen
+            if row.a:
+                good_vals.append(row.a['title']) #extract name
+            if(row.th.a):
+                title = " ".join(row.th.a['title'].split()[-2:]).replace("mm ","")
+                good_vals.insert(0,f"{title}")
+            data_rows.append(good_vals)
+    data_rows = data_rows[1:]
+
+    headers = ["Name","Damage","Pen","Sold by"]
+
+    print (f"{headers}\n{data_rows}")
+
+    lengths = []
+
+
+    #rough sizing for table
+    for i in range(0,len(headers)):
+        head_len = len(headers[i])
+        item_len = len(data_rows[0][i])
+        lengths.append(max(head_len,item_len))
+
+    table.set_cols_width(lengths)
+    table.header(headers)
+    table.add_row(headers)
+    table.add_rows(data_rows)
+
+
+
+    #print (table.draw())
+
+
+    
 
 
 #@bot.command(name = 'key', help = "Gives you the map and rating out of 5 stars for a key")
