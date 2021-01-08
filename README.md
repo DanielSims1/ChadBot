@@ -29,7 +29,7 @@
                                  
 ✔️     !ammochart
 
--       !ammo -g[un] <gun_name> -c[aliber] <round_caliber>
+✔️       !ammo -g[un] <gun_name> -c[aliber] <round_caliber>
 -      !armor <name>
 -       !sellorder
 -        !bitcoin !btc 
