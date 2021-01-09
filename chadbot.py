@@ -143,10 +143,17 @@ async def key(ctx, *, search_arg):
 
     keys_page = requests.get("https://escapefromtarkov.gamepedia.com/Category:Keys")
     keys_soup = BeautifulSoup(keys_page.text, 'html.parser')
+    search_arg = search_arg.strip()
+    search_arg_s = search_arg.replace(" ","_")
+    known_key_link = keys_soup.find('a',href=re.compile(search_arg_s,re.IGNORECASE),text=re.compile(search_arg,re.IGNORECASE))
+    is_keycard = False
+    # check for keycard instead of key
 
-    search_arg = search_arg.strip().replace(" ","_")
-    known_key_link = keys_soup.find(href=re.compile(search_arg,re.IGNORECASE))
-    
+    if(known_key_link == None):
+        keycards_page = requests.get("https://escapefromtarkov.gamepedia.com/Category:Keycards")
+        keycards_soup = BeautifulSoup(keycards_page.text, 'html.parser')
+        known_key_link = keycards_soup.find('a',href=re.compile(search_arg_s,re.IGNORECASE), text=re.compile(search_arg,re.IGNORECASE))
+
     title = known_key_link['title']
     href = known_key_link['href']
     key_page = requests.get(f"{tarkov_wiki_base_url}{href}")
@@ -156,7 +163,7 @@ async def key(ctx, *, search_arg):
     usage = key_soup.find('td',text="Usage")
     if(usage != None):
         desc = usage.find_next(class_="va-infobox-content").text + "\n"
-    behind_the_lock = key_soup.find('span',text='Behind the Lock', class_='mw-headline').find_next('ul').find_all('li')
+    behind_the_lock = key_soup.find('span',text=re.compile('Behind the Lock',re.IGNORECASE), class_='mw-headline').find_next('ul').find_all('li')
     btl_items = []
     for item in behind_the_lock:
         btl_items.append(item.text)
