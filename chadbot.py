@@ -28,6 +28,9 @@ GUILD = os.getenv('DISCORD_GUILD')
 
 LOGGING = True
 
+tarkov_wiki_base_url = "https://escapefromtarkov.gamepedia.com"
+tarkov_wiki_base_search_url = "https://escapefromtarkov.gamepedia.com/Special:Search?search="
+
 traders = ["Jaeger", "Prapor", "Therapist", "Skier", "Peacekeeper", "Mechanic", "Ragman", "Fence"]
 
 # This could be a mapping of gun names to screenshots of meta builds. screenshots could potentially be stored on this device and sent with the message.
@@ -75,19 +78,13 @@ async def cheeki(ctx):
 async def dicky(ctx):
     await ctx.send("needles")
 
-def tableify(headers, data):
-    ret_string = ""
-    ret_string = " | ".join(headers)
-
-
-
 @bot.command(name = "ammo", help = "Shows an ammo chart for the requested gun or caliber")
 async def ammo(ctx, gun):
     # Get the ammo page then search for rounds associated with a given gun
     wiki_ammo_page = requests.get("https://escapefromtarkov.gamepedia.com/Ammunition", auth=('user','pass'))
     ammo_soup = BeautifulSoup(wiki_ammo_page.text, 'html.parser')
 
-    gun_row =  ammo_soup.find(string=re.compile(gun)).parent.parent.parent
+    gun_row =  ammo_soup.find(string=re.compile(gun,re.IGNORECASE)).parent.parent.parent
     href = gun_row.find("a")["href"]
     
     gun_page = requests.get(f"https://escapefromtarkov.gamepedia.com{href}", auth=('user','pass'))
@@ -140,21 +137,53 @@ async def ammo(ctx, gun):
     await ctx.send(content=f"Ammo Chart for {nice_ammo}",embed=embed)
 
 
-#@bot.command(name = 'key', help = "Gives you the map and rating out of 5 stars for a key")
-async def key(ctx):
-    # So we want to do another search on the wiki for a key then rate the key  0/5 [ ] --> 5/5 [⭐⭐⭐⭐⭐]
-    # also notify user if this is a quest key
-    weights = ["ledx", "graphics card", "safe"]
-    scoring_items = [50, 30, 20]
-    quest = "❗"
+@bot.command(name = 'key', help = "Gives you information on a key")
+async def key(ctx, *, search_arg):
+    #Show the key location/what's behind the lock and also notify user if this is a quest key
+
+    keys_page = requests.get("https://escapefromtarkov.gamepedia.com/Category:Keys")
+    keys_soup = BeautifulSoup(keys_page.text, 'html.parser')
+
+    search_arg = search_arg.strip().replace(" ","_")
+    known_key_link = keys_soup.find(href=re.compile(search_arg,re.IGNORECASE))
+    
+    title = known_key_link['title']
+    href = known_key_link['href']
+    key_page = requests.get(f"{tarkov_wiki_base_url}{href}")
+    key_soup = BeautifulSoup(key_page.text, 'html.parser')
+
+    desc = ""
+    usage = key_soup.find('td',text="Usage")
+    if(usage != None):
+        desc = usage.find_next(class_="va-infobox-content").text + "\n"
+    behind_the_lock = key_soup.find('span',text='Behind the Lock', class_='mw-headline').find_next('ul').find_all('li')
+    btl_items = []
+    for item in behind_the_lock:
+        btl_items.append(item.text)
+    btl_string = "No information"
+
+    if len(btl_items ) > 0:
+        btl_string = "- " + "\n- ".join(btl_items)
+
+    icon = key_soup.find(class_='va-infobox-icon').find('img')['src']
+    is_quest_key = key_soup.find(class_='mw-headline',id='Quests')
+    quest_text = ""
+    quest_title = ""
+    if(is_quest_key != None):
+        quest_text = is_quest_key.find_next('ul').text +"\n\n"
+        quest_title = "**__Quests__**\n"
+
+    embed = discord.Embed(description=f"{desc}{quest_title}{quest_text}**__Behind the Lock__**\n{btl_string}")
+    embed.set_author(name=title,url=f"{tarkov_wiki_base_url}{href}")
+    embed.set_thumbnail(url=icon)
+    await ctx.send(embed=embed,content = "Here you go comrade: 🔑")
 
 
 @bot.command(name= "price", help = "Queries for lowest current price of item on the flea market")
 async def price(ctx, *,search_arg):
     # Use wiki to get well-formatted text then convert to the tarkov-market.com format [" " -> "_"]
     search_string = str(search_arg)
-    tarkov_wiki_base_url = "https://escapefromtarkov.gamepedia.com/Special:Search?search="
-    tarkov_wiki = requests.get(f"{tarkov_wiki_base_url}{search_string}", auth=('user','pass'))
+    tarkov_wiki = requests.get(f"{tarkov_wiki_base_search_url}{search_string}", auth=('user','pass'))
 
     tarkov_market_url = "https://tarkov-market.com/item/"
 
@@ -264,15 +293,14 @@ async def bestkeys(ctx):
 @bot.command(name='wiki', help = "Queries the Tarkov Wiki")
 async def wiki(ctx, *,search_arg):
     search_string = str(search_arg)
-    tarkov_wiki_base_url = "https://escapefromtarkov.gamepedia.com/Special:Search?search="
-    tarkov_wiki = requests.get(f"{tarkov_wiki_base_url}{search_string}", auth=('user','pass'))
+    tarkov_wiki = requests.get(f"{tarkov_wiki_base_search_url}{search_string}", auth=('user','pass'))
 
     soup = BeautifulSoup(tarkov_wiki.text, 'html.parser')
 
     is_correct_page = soup.find("meta", property = "og:description")
     # If we searched the exact name of a page, then we are brought directly to it
     if is_correct_page:
-        embed = discord.Embed(title=search_string,description=f"[{search_string} Wiki Page]({tarkov_wiki_base_url}{search_string})")
+        embed = discord.Embed(title=search_string,description=f"[{search_string} Wiki Page]({tarkov_wiki_base_search_url}{search_string})")
         await ctx.send(content=f"Here is the wiki page for `{search_string}` comrade:",embed=embed)
     
     # Otherwise show top x search results
