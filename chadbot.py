@@ -307,7 +307,7 @@ async def wiki(ctx, *,search_arg):
     is_correct_page = soup.find("meta", property = "og:description")
     # If we searched the exact name of a page, then we are brought directly to it
     if is_correct_page:
-        embed = discord.Embed(title=search_string,description=f"[{search_string} Wiki Page]({tarkov_wiki_base_search_url}{search_string})")
+        embed = discord.Embed(title=search_string,url=f"{tarkov_wiki_base_search_url}{search_string}",description=f"[{search_string} Wiki Page]({tarkov_wiki_base_search_url}{search_string})")
         await ctx.send(content=f"Here is the wiki page for `{search_string}` comrade:",embed=embed)
     
     # Otherwise show top x search results
