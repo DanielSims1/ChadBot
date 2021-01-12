@@ -297,7 +297,18 @@ async def ammochart(ctx):
 async def bestkeys(ctx):
     await ctx.send("out of date best keys --> https://preview.redd.it/let6rgrtq8951.png?width=960&crop=smart&auto=webp&s=bb6ecc50549e3dc4c7e9d6e75529820613d003b1")
 
-@bot.command(name='wiki', help = "Queries the Tarkov Wiki")
+@bot.command(name = "btc",aliases = ["bitcoin"], help="Shows current butcoin price")
+async def btc(ctx):
+    tarkov_market_url = requests.get("https://tarkov-market.com/item/physical_bitcoin_(btc)")
+    soup = BeautifulSoup(tarkov_market_url.text, 'html.parser')
+
+    icon="https://gamepedia.cursecdn.com/escapefromtarkov_gamepedia/thumb/5/50/Bitcoin.png/307px-Bitcoin.png?version=8e52ba2af892f873b43a831638315887"
+    embed = discord.Embed(title="Physical Bitcoin (btc)",description=soup.find("div", class_="price last").string)
+    embed.set_thumbnail(url=icon)
+    await ctx.send(content=f"Here is the current bitcoin price` comrade:",embed=embed)
+
+
+@bot.command(name='wiki',aliases = ["w","WHATTHEFUCKIS", "whatthefuckis", "gib"], help = "Queries the Tarkov Wiki")
 async def wiki(ctx, *,search_arg):
     search_string = str(search_arg)
     tarkov_wiki = requests.get(f"{tarkov_wiki_base_search_url}{search_string}", auth=('user','pass'))
