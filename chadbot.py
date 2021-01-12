@@ -307,7 +307,32 @@ async def wiki(ctx, *,search_arg):
     is_correct_page = soup.find("meta", property = "og:description")
     # If we searched the exact name of a page, then we are brought directly to it
     if is_correct_page:
-        embed = discord.Embed(title=search_string,url=f"{tarkov_wiki_base_search_url}{search_string}",description=f"[{search_string} Wiki Page]({tarkov_wiki_base_search_url}{search_string})")
+        icon = None
+        icon_big = soup.find(class_='va-infobox-icon')
+        if icon_big:
+            icon = icon_big.find('img')['src']
+
+        desc_string = ""
+        desc = soup.find("span",id="Description")
+        if desc != None:
+            desc_string += "**__Description:__**\n" + desc.find_next("p").text + "\n"
+
+        notes = soup.find("span",id="Notes")
+        if notes != None:
+            txt = notes.find_next('ul')
+            if txt != None :
+                desc_string+="**__Notes:__**\n" + txt.text + "\n"
+
+        quests = soup.find("span",id="Quests")
+        if quests != None:
+            txt = quests.find_next('ul')
+            if txt:
+                desc_string+="**__Quests:__**\n" + txt.text
+
+        embed = discord.Embed(title=soup.find("meta",property="og:title")["content"],url=f"{tarkov_wiki_base_search_url}{search_string}",
+        description= desc_string)
+        if icon != None:
+            embed.set_thumbnail(url=icon)
         await ctx.send(content=f"Here is the wiki page for `{search_string}` comrade:",embed=embed)
     
     # Otherwise show top x search results
